@@ -1,3 +1,43 @@
-[gd_scene format=3 uid="uid://detwgted2iayx"]
+[gd_scene load_steps=5 format=3 uid="uid://detwgted2iayx"]
+
+[ext_resource type="MeshLibrary" uid="uid://vksb2mjbfufr" path="res://mesh_libraries/mesh_library_01.meshlib" id="1_lxa6j"]
+[ext_resource type="PackedScene" uid="uid://cc1yqqhs2p13t" path="res://objects/actor/actor.tscn" id="2_q3leo"]
+[ext_resource type="Script" path="res://script/nodes/player_control.gd" id="3_23klk"]
+
+[sub_resource type="Environment" id="Environment_bnvsd"]
+background_mode = 1
+background_color = Color(0.82, 0.684837, 0.4674, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.819608, 0.686275, 0.466667, 1)
 
 [node name="World" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_bnvsd")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.800899, 0.5988, 0, -0.5988, 0.800899, 0, 9.41063, 0)
+
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource("1_lxa6j")
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(65535, 65535, 0, 0, 65535, 0, 0, 0, 0, 65535, 0, 0, 65534, 0, 0, 65534, 65535, 0, 65534, 65534, 0, 65533, 65534, 0, 65533, 65533, 0, 65533, 65532, 0, 65533, 65531, 0, 65533, 65530, 0, 65534, 65531, 0, 65534, 65532, 0, 65534, 65533, 0, 65534, 65530, 0, 65534, 65529, 0, 65533, 65529, 0, 65535, 65530, 0, 65535, 65529, 0, 0, 65529, 0, 1, 65529, 0, 1, 65530, 0, 1, 65531, 0, 1, 65532, 0, 1, 65533, 0, 1, 65534, 0, 1, 65535, 0, 1, 0, 0, 0, 65534, 0, 0, 65533, 0, 0, 65532, 0, 0, 65531, 0, 0, 65530, 0, 65535, 65531, 0, 65535, 65532, 0, 65535, 65533, 0, 65535, 65534, 0, 65533, 65535, 0, 65533, 0, 0, 65532, 65535, 0, 65532, 65534, 0, 65532, 65533, 0, 65532, 65532, 0, 65532, 65531, 0, 65532, 65530, 0, 2, 65535, 0, 2, 65534, 0, 2, 65533, 0, 2, 65532, 0, 2, 65531, 0, 2, 65530, 0, 65537, 65534, 0, 65536, 65534, 0, 131071, 65534, 0, 131070, 65534, 0, 131069, 65534, 0, 131069, 65533, 0, 131069, 65532, 0, 131069, 65531, 0, 131070, 65531, 0, 131071, 65531, 0, 65536, 65531, 0, 65537, 65531, 0, 65537, 65532, 0, 65537, 65533, 0, 131070, 65535, 0, 131071, 65535, 0, 65536, 65535, 0, 65536, 65530, 0, 131071, 65530, 0, 131070, 65530, 0, 65536, 65533, 0, 65536, 65532, 0, 131071, 65532, 0, 131070, 65532, 0, 131070, 65533, 0, 131071, 65533, 0, 196606, 65533, 0)
+}
+metadata/_editor_floor_ = Vector3(0, 0, 0)
+
+[node name="Actor" parent="GridMap" instance=ExtResource("2_q3leo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3735, -1.03018)
+
+[node name="PlayerControl" type="Node" parent="GridMap/Actor" node_paths=PackedStringArray("actor")]
+script = ExtResource("3_23klk")
+actor = NodePath("..")
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(0.577858, 0, 0.816138, 0, 1, 0, -0.816138, 0, 0.577858, 9.2036, 11.2077, 1.45486)
+
+[node name="Camera3D" type="Camera3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0)
+projection = 1
+size = 20.0
+near = 0.001

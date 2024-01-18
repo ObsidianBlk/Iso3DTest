@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://uynapch02khm"]
+
+[ext_resource type="Texture2D" uid="uid://bhn1ue3ns2dqb" path="res://assets/graphics/prototyping/Orange/texture_02.png" id="1_0niwl"]
+
+[resource]
+resource_name = "Prototype_Texture2"
+cull_mode = 2
+albedo_texture = ExtResource("1_0niwl")
+roughness = 0.5
