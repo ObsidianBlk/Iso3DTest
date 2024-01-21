@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://cc1yqqhs2p13t"]
+
+[ext_resource type="Script" path="res://objects/sprite_actor/sprite_actor.gd" id="1_nhwub"]
+[ext_resource type="SpriteFrames" uid="uid://d4bntjvoh343n" path="res://assets/graphics/BaseHumanMaleFrames.tres" id="2_igfy8"]
+[ext_resource type="Script" path="res://script/nodes/directional_sprite_3d.gd" id="34_h3gk3"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ilrkc"]
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ov8am"]
+albedo_color = Color(1, 0, 0, 1)
+
+[node name="SpriteActor" type="CharacterBody3D"]
+script = ExtResource("1_nhwub")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CapsuleShape3D_ilrkc")
+
+[node name="DirectionalSprite3D" type="AnimatedSprite3D" parent="."]
+centered = false
+offset = Vector2(-74, -26)
+pixel_size = 0.018
+billboard = 2
+texture_filter = 2
+sprite_frames = ExtResource("2_igfy8")
+animation = &"run_7"
+autoplay = "idle_0"
+script = ExtResource("34_h3gk3")
+
+[node name="CSGTorus3D" type="CSGTorus3D" parent="DirectionalSprite3D"]
+inner_radius = 0.48
+outer_radius = 0.52
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="DirectionalSprite3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
+radius = 0.16
+radial_segments = 6
+material = SubResource("StandardMaterial3D_ov8am")

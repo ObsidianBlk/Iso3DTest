@@ -1,5 +1,5 @@
-extends AnimatedSprite3D
-class_name DirectionalSprite3D
+extends Actor
+class_name SpriteActor
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -9,22 +9,23 @@ class_name DirectionalSprite3D
 # ------------------------------------------------------------------------------
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
-const FACING_COUNT : int = 8
 
 # ------------------------------------------------------------------------------
 # Export Variables
 # ------------------------------------------------------------------------------
-@export_category("Directional Sprite 3D")
-@export var base_animation : String = ""
+@export_category("Sprite Actor")
+@export var sprite_frames : SpriteFrames = null
 
 # ------------------------------------------------------------------------------
 # Variables
 # ------------------------------------------------------------------------------
-var _camera : WeakRef = weakref(null)
+var _movement : Vector2 = Vector2.ZERO
+var _rotation_strength : float = 0.0
 
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
+@onready var directional_sprite_3d: DirectionalSprite3D = $DirectionalSprite3D
 
 
 # ------------------------------------------------------------------------------
@@ -35,61 +36,39 @@ var _camera : WeakRef = weakref(null)
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
-func _process(delta: float) -> void:
-	var camera : Camera3D = _GetCamera()
-	if camera == null: return
-	var cam_pos_2D : Vector2 = Vector2(camera.global_position.x, camera.global_position.z)
-	var self_pos_2D : Vector2 = Vector2(global_position.x, global_position.z)
-	
-	var angle : float = self_pos_2D.angle_to_point(cam_pos_2D)
-	#print(rad_to_deg(angle + global_rotation.y))
-	var idx : int = _AngleToIndex(angle)
-	#print("Index: ", idx)
-	if idx >= 0:
-		_Play(idx)
+func _physics_process(delta: float) -> void:
+	_ProcessRotation(delta)
+	_ProcessVelocity()
+	if _IsMoving():
+		directional_sprite_3d.base_animation = "run"
+	else:
+		directional_sprite_3d.base_animation = "idle"
+	move_and_slide()
 
 # ------------------------------------------------------------------------------
 # Private Methods
 # ------------------------------------------------------------------------------
-func _GetCamera() -> Camera3D:
-	var camera : Camera3D = _camera.get_ref()
-	if camera == null:
-		var viewport : Viewport = get_viewport()
-		if viewport == null: return null
-		camera = viewport.get_camera_3d()
-		_camera = weakref(camera)
-	return camera
+func _ProcessRotation(delta : float) -> void:
+	if abs(_rotation_strength) < ROTATION_STRENGTH_THRESHOLD: return
+	var rot : float = directional_sprite_3d.global_rotation.y
+	directional_sprite_3d.global_rotation.y = wrapf(rot + (deg_to_rad(turn_rate) * _rotation_strength * delta), -PI, PI)
 
-func _AngleToIndex(angle : float) -> int:
-	angle = rad_to_deg(wrapf(angle + global_rotation.y, 0, 2*PI))
-	for i in range(FACING_COUNT):
-		match i:
-			0:
-				if angle >= 337.5 or angle < 22.5:
-					return i
-			_:
-				var target : float = i * 45.0
-				if angle >= target - 22.5 and angle < target + 22.5:
-					return i
-	return -1
+func _ProcessVelocity() -> void:
+	var movement_rotated : Vector3 = Vector3(_movement.x, 0.0, _movement.y).rotated(Vector3.UP, directional_sprite_3d.global_rotation.y)
+	velocity = movement_rotated * max_speed
+	velocity += Vector3.DOWN * gravity
 
-func _Play(facing : int) -> void:
-	if base_animation.is_empty():
-		stop()
-		return
-	
-	var target_anim : StringName = "%s_%d"%[base_animation, facing]
-	if animation == target_anim: return # Already playing animation
-	var cur_frame : int = frame if animation.begins_with(base_animation) else 0
-		
-	play(target_anim)
-	if cur_frame != 0:
-		frame = cur_frame
+func _IsMoving() -> bool:
+	return Vector2(velocity.x, velocity.z).length() > 0.01
 
 # ------------------------------------------------------------------------------
 # Public Methods
 # ------------------------------------------------------------------------------
+func move(movement : Vector2) -> void:
+	_movement = movement
 
+func turn(strength : float) -> void:
+	_rotation_strength = clampf(strength, -1.0, 1.0)
 
 # ------------------------------------------------------------------------------
 # Handler Methods

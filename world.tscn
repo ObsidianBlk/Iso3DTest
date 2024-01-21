@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://detwgted2iayx"]
 
 [ext_resource type="MeshLibrary" uid="uid://vksb2mjbfufr" path="res://mesh_libraries/mesh_library_01.meshlib" id="1_lxa6j"]
-[ext_resource type="PackedScene" uid="uid://cc1yqqhs2p13t" path="res://objects/actor/actor.tscn" id="2_q3leo"]
+[ext_resource type="PackedScene" uid="uid://cc1yqqhs2p13t" path="res://objects/sprite_actor/sprite_actor.tscn" id="2_q3leo"]
 [ext_resource type="Script" path="res://script/nodes/player_control.gd" id="3_23klk"]
 
 [sub_resource type="Environment" id="Environment_bnvsd"]
@@ -27,7 +27,7 @@ data = {
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="Actor" parent="GridMap" instance=ExtResource("2_q3leo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3735, -1.03018)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3735, -10.5945)
 
 [node name="PlayerControl" type="Node" parent="GridMap/Actor" node_paths=PackedStringArray("actor")]
 script = ExtResource("3_23klk")

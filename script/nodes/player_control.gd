@@ -45,7 +45,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
 		actor.move(movement)
 	if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-		var strength : float = Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left")
+		var strength : float = Input.get_axis("turn_right", "turn_left")
 		actor.turn(strength)
 
 # ------------------------------------------------------------------------------
