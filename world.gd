@@ -1,5 +1,4 @@
-extends Node
-class_name PlayerControl
+extends Node3D
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -10,12 +9,11 @@ class_name PlayerControl
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Export Variables
 # ------------------------------------------------------------------------------
-@export_category("Player Control")
-@export var actor : Actor = null:							set = set_actor
-@export var iso_camera_manager : IsoCameraManager = null:	set = set_iso_camera_manager
+
 
 # ------------------------------------------------------------------------------
 # Variables
@@ -25,18 +23,11 @@ class_name PlayerControl
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-func set_actor(a : Actor) -> void:
-	if a != actor:
-		_DisconnectActor()
-		actor = a
-		_ConnectActor()
-		if iso_camera_manager != null:
-			iso_camera_manager.actor = actor
+@onready var _player_control: PlayerControl = $PlayerControl
 
-func set_iso_camera_manager(icm : IsoCameraManager) -> void:
-	if iso_camera_manager !=icm:
-		iso_camera_manager = icm
-		iso_camera_manager.actor = actor
+@onready var _sprite_actor: SpriteActor = $GridMap/SpriteActor
+@onready var _character_actor: CharacterActor = $GridMap/CharacterActor
+
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
@@ -46,38 +37,19 @@ func set_iso_camera_manager(icm : IsoCameraManager) -> void:
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
-func _ready() -> void:
-	if iso_camera_manager != null:
-		iso_camera_manager.actor = actor
-
 func _unhandled_input(event: InputEvent) -> void:
-	if actor != null:
-		if _IsEventOneOf(event, ["forward", "backward", "left", "right"]):
-			var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
-			actor.move(movement)
-		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-			var strength : float = Input.get_axis("turn_right", "turn_left")
-			actor.turn(strength)
-	if iso_camera_manager != null:
-		if event.is_action_pressed("camera_rotate_left"):
-			iso_camera_manager.rotate_camera_left()
-		if event.is_action_pressed("camera_rotate_right"):
-			iso_camera_manager.rotate_camera_right()
+	if event.is_action_pressed("ui_cancel"):
+		get_tree().quit()
+	if event.is_action_pressed("actor_toggle"):
+		if _player_control.actor == _sprite_actor:
+			_player_control.actor = _character_actor
+		else:
+			_player_control.actor = _sprite_actor
 
 # ------------------------------------------------------------------------------
 # Private Methods
 # ------------------------------------------------------------------------------
-func _ConnectActor() -> void:
-	if actor == null: return
 
-func _DisconnectActor() -> void:
-	if actor == null: return
-
-func _IsEventOneOf(event : InputEvent, actions : Array[String]) -> bool:
-	for action in actions:
-		if event.is_action(action):
-			return true
-	return false
 
 # ------------------------------------------------------------------------------
 # Public Methods

@@ -1,16 +1,26 @@
-[gd_scene load_steps=5 format=3 uid="uid://detwgted2iayx"]
+[gd_scene load_steps=8 format=3 uid="uid://detwgted2iayx"]
 
+[ext_resource type="Script" path="res://world.gd" id="1_dy0fl"]
 [ext_resource type="MeshLibrary" uid="uid://vksb2mjbfufr" path="res://mesh_libraries/mesh_library_01.meshlib" id="1_lxa6j"]
 [ext_resource type="PackedScene" uid="uid://cc1yqqhs2p13t" path="res://objects/sprite_actor/sprite_actor.tscn" id="2_q3leo"]
 [ext_resource type="Script" path="res://script/nodes/player_control.gd" id="3_23klk"]
+[ext_resource type="PackedScene" uid="uid://bfu73mwxl4oj7" path="res://objects/character_actor/character_actor.tscn" id="5_tg2vn"]
+[ext_resource type="Script" path="res://script/nodes/iso_camera_manager.gd" id="6_tuhle"]
 
 [sub_resource type="Environment" id="Environment_bnvsd"]
 background_mode = 1
 background_color = Color(0.82, 0.684837, 0.4674, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.819608, 0.686275, 0.466667, 1)
+tonemap_mode = 1
 
 [node name="World" type="Node3D"]
+script = ExtResource("1_dy0fl")
+
+[node name="PlayerControl" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera_manager")]
+script = ExtResource("3_23klk")
+actor = NodePath("../GridMap/SpriteActor")
+iso_camera_manager = NodePath("../IsoCameraManager")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_bnvsd")
@@ -26,18 +36,20 @@ data = {
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="Actor" parent="GridMap" instance=ExtResource("2_q3leo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3735, -10.5945)
+[node name="SpriteActor" parent="GridMap" instance=ExtResource("2_q3leo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
 
-[node name="PlayerControl" type="Node" parent="GridMap/Actor" node_paths=PackedStringArray("actor")]
-script = ExtResource("3_23klk")
-actor = NodePath("..")
+[node name="CharacterActor" parent="GridMap" instance=ExtResource("5_tg2vn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.60782, -1.34277)
 
-[node name="Node3D" type="Node3D" parent="."]
-transform = Transform3D(0.577858, 0, 0.816138, 0, 1, 0, -0.816138, 0, 0.577858, 9.2036, 11.2077, 1.45486)
+[node name="Chaser" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 10, 0)
 
-[node name="Camera3D" type="Camera3D" parent="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0)
+[node name="IsoCameraManager" type="Node3D" parent="."]
+script = ExtResource("6_tuhle")
+
+[node name="Camera3D" type="Camera3D" parent="IsoCameraManager"]
+transform = Transform3D(0.577858, -0.577097, 0.577096, 0, 0.707107, 0.707107, -0.816138, -0.408607, 0.408607, 2, 4, 2)
 projection = 1
-size = 20.0
+size = 8.0
 near = 0.001

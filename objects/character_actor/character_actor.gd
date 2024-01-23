@@ -1,5 +1,5 @@
-extends Node
-class_name PlayerControl
+extends Actor
+class_name CharacterActor
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -10,33 +10,25 @@ class_name PlayerControl
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Export Variables
 # ------------------------------------------------------------------------------
-@export_category("Player Control")
-@export var actor : Actor = null:							set = set_actor
-@export var iso_camera_manager : IsoCameraManager = null:	set = set_iso_camera_manager
+
 
 # ------------------------------------------------------------------------------
 # Variables
 # ------------------------------------------------------------------------------
-
+var _movement : Vector2 = Vector2.ZERO
+var _rotation_strength : float = 0.0
 
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-func set_actor(a : Actor) -> void:
-	if a != actor:
-		_DisconnectActor()
-		actor = a
-		_ConnectActor()
-		if iso_camera_manager != null:
-			iso_camera_manager.actor = actor
+@onready var _character: Node3D = $Character
+@onready var _anim: AnimationPlayer = $Character/AnimationPlayer
 
-func set_iso_camera_manager(icm : IsoCameraManager) -> void:
-	if iso_camera_manager !=icm:
-		iso_camera_manager = icm
-		iso_camera_manager.actor = actor
+
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
@@ -46,43 +38,39 @@ func set_iso_camera_manager(icm : IsoCameraManager) -> void:
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
-func _ready() -> void:
-	if iso_camera_manager != null:
-		iso_camera_manager.actor = actor
-
-func _unhandled_input(event: InputEvent) -> void:
-	if actor != null:
-		if _IsEventOneOf(event, ["forward", "backward", "left", "right"]):
-			var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
-			actor.move(movement)
-		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-			var strength : float = Input.get_axis("turn_right", "turn_left")
-			actor.turn(strength)
-	if iso_camera_manager != null:
-		if event.is_action_pressed("camera_rotate_left"):
-			iso_camera_manager.rotate_camera_left()
-		if event.is_action_pressed("camera_rotate_right"):
-			iso_camera_manager.rotate_camera_right()
+func _physics_process(delta: float) -> void:
+	_ProcessRotation(delta)
+	_ProcessVelocity()
+	if _IsMoving():
+		_anim.play("Running")
+	else:
+		_anim.play("Idle")
+	move_and_slide()
 
 # ------------------------------------------------------------------------------
 # Private Methods
 # ------------------------------------------------------------------------------
-func _ConnectActor() -> void:
-	if actor == null: return
+func _ProcessRotation(delta : float) -> void:
+	if abs(_rotation_strength) < ROTATION_STRENGTH_THRESHOLD: return
+	var rot : float = _character.rotation.y
+	_character.rotation.y = wrapf(rot + (deg_to_rad(turn_rate) * _rotation_strength * delta), -PI, PI)
 
-func _DisconnectActor() -> void:
-	if actor == null: return
+func _ProcessVelocity() -> void:
+	var movement_rotated : Vector3 = Vector3(_movement.x, 0.0, _movement.y).rotated(Vector3.UP, _character.rotation.y)
+	velocity = movement_rotated * max_speed
+	velocity += Vector3.DOWN * gravity
 
-func _IsEventOneOf(event : InputEvent, actions : Array[String]) -> bool:
-	for action in actions:
-		if event.is_action(action):
-			return true
-	return false
+func _IsMoving() -> bool:
+	return Vector2(velocity.x, velocity.z).length() > 0.01
 
 # ------------------------------------------------------------------------------
 # Public Methods
 # ------------------------------------------------------------------------------
+func move(movement : Vector2) -> void:
+	_movement = movement
 
+func turn(strength : float) -> void:
+	_rotation_strength = clampf(strength, -1.0, 1.0)
 
 # ------------------------------------------------------------------------------
 # Handler Methods

@@ -1,5 +1,5 @@
-extends Node
-class_name PlayerControl
+extends Node3D
+class_name IsoCameraManager
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -9,34 +9,31 @@ class_name PlayerControl
 # ------------------------------------------------------------------------------
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
+const CAMERA_ROTATIONS : Array[float] = [
+	54.7,
+	144.7,
+	234.7,
+	324.7
+]
 
 # ------------------------------------------------------------------------------
 # Export Variables
 # ------------------------------------------------------------------------------
-@export_category("Player Control")
-@export var actor : Actor = null:							set = set_actor
-@export var iso_camera_manager : IsoCameraManager = null:	set = set_iso_camera_manager
+@export_category("Iso Camera Manager")
+@export var actor : Actor = null
 
 # ------------------------------------------------------------------------------
 # Variables
 # ------------------------------------------------------------------------------
+var _camera : Camera3D = null
 
+var _camera_rot_index : int = 0
+var _tween_active : bool = false
 
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-func set_actor(a : Actor) -> void:
-	if a != actor:
-		_DisconnectActor()
-		actor = a
-		_ConnectActor()
-		if iso_camera_manager != null:
-			iso_camera_manager.actor = actor
 
-func set_iso_camera_manager(icm : IsoCameraManager) -> void:
-	if iso_camera_manager !=icm:
-		iso_camera_manager = icm
-		iso_camera_manager.actor = actor
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
@@ -46,43 +43,47 @@ func set_iso_camera_manager(icm : IsoCameraManager) -> void:
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
-func _ready() -> void:
-	if iso_camera_manager != null:
-		iso_camera_manager.actor = actor
-
-func _unhandled_input(event: InputEvent) -> void:
+func _process(_delta: float) -> void:
 	if actor != null:
-		if _IsEventOneOf(event, ["forward", "backward", "left", "right"]):
-			var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
-			actor.move(movement)
-		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-			var strength : float = Input.get_axis("turn_right", "turn_left")
-			actor.turn(strength)
-	if iso_camera_manager != null:
-		if event.is_action_pressed("camera_rotate_left"):
-			iso_camera_manager.rotate_camera_left()
-		if event.is_action_pressed("camera_rotate_right"):
-			iso_camera_manager.rotate_camera_right()
+		position = actor.position
 
 # ------------------------------------------------------------------------------
 # Private Methods
 # ------------------------------------------------------------------------------
-func _ConnectActor() -> void:
-	if actor == null: return
+func _GetCamera() -> Camera3D:
+	if _camera == null:
+		for child : Node in get_children():
+			if child is Camera3D:
+				_camera = child
+	return _camera
 
-func _DisconnectActor() -> void:
-	if actor == null: return
-
-func _IsEventOneOf(event : InputEvent, actions : Array[String]) -> bool:
-	for action in actions:
-		if event.is_action(action):
-			return true
-	return false
+func _RotateCamera(dir : int) -> void:
+	var camera : Camera3D = _GetCamera()
+	if _tween_active or camera == null: return
+	
+	dir = clampi(dir, -1, 1)
+	_camera_rot_index = wrapi(_camera_rot_index + dir, 0, CAMERA_ROTATIONS.size() - 1)
+	
+	var target_rotation : Vector3 = camera.rotation
+	target_rotation.y = CAMERA_ROTATIONS[_camera_rot_index]
+	
+	_tween_active = true
+	var tween : Tween = create_tween()
+	tween.tween_property(_camera, "rotation", target_rotation, 0.5)
+	await tween.finished
+	
+	camera.rotation.y = CAMERA_ROTATIONS[_camera_rot_index]
+	_tween_active = false
+	
 
 # ------------------------------------------------------------------------------
 # Public Methods
 # ------------------------------------------------------------------------------
+func rotate_camera_left() -> void:
+	_RotateCamera(-1)
 
+func rotate_camera_right() -> void:
+	_RotateCamera(1)
 
 # ------------------------------------------------------------------------------
 # Handler Methods

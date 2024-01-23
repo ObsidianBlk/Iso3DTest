@@ -24,16 +24,18 @@ pixel_size = 0.018
 billboard = 2
 texture_filter = 2
 sprite_frames = ExtResource("2_igfy8")
-animation = &"run_7"
+animation = &"run_0"
 autoplay = "idle_0"
 script = ExtResource("34_h3gk3")
 
 [node name="CSGTorus3D" type="CSGTorus3D" parent="DirectionalSprite3D"]
+visible = false
 inner_radius = 0.48
 outer_radius = 0.52
 
 [node name="CSGSphere3D" type="CSGSphere3D" parent="DirectionalSprite3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
+visible = false
 radius = 0.16
 radial_segments = 6
 material = SubResource("StandardMaterial3D_ov8am")

@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://b5b0wnu5jc1lh"]
+
+[ext_resource type="Texture2D" uid="uid://cdk4hsrpwwie3" path="res://assets/models/character/material/humanMaleA.png" id="1_wuf2t"]
+
+[resource]
+albedo_texture = ExtResource("1_wuf2t")
