@@ -1,11 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://detwgted2iayx"]
+[gd_scene load_steps=9 format=3 uid="uid://detwgted2iayx"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_dy0fl"]
 [ext_resource type="MeshLibrary" uid="uid://vksb2mjbfufr" path="res://mesh_libraries/mesh_library_01.meshlib" id="1_lxa6j"]
 [ext_resource type="PackedScene" uid="uid://cc1yqqhs2p13t" path="res://objects/sprite_actor/sprite_actor.tscn" id="2_q3leo"]
 [ext_resource type="Script" path="res://script/nodes/player_control.gd" id="3_23klk"]
 [ext_resource type="PackedScene" uid="uid://bfu73mwxl4oj7" path="res://objects/character_actor/character_actor.tscn" id="5_tg2vn"]
-[ext_resource type="Script" path="res://script/nodes/iso_camera_manager.gd" id="6_tuhle"]
+[ext_resource type="PackedScene" uid="uid://cb16m28qt5rjk" path="res://objects/iso_camera/iso_camera.tscn" id="6_lbm1a"]
 
 [sub_resource type="Environment" id="Environment_bnvsd"]
 background_mode = 1
@@ -14,19 +14,44 @@ ambient_light_source = 2
 ambient_light_color = Color(0.819608, 0.686275, 0.466667, 1)
 tonemap_mode = 1
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_d4ab1"]
+noise_type = 3
+frequency = 0.0545
+fractal_type = 3
+fractal_octaves = 3
+domain_warp_enabled = true
+domain_warp_type = 2
+
 [node name="World" type="Node3D"]
 script = ExtResource("1_dy0fl")
 
-[node name="PlayerControl" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera_manager")]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="ShakeButton" type="Button" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "Shake Camera"
+
+[node name="PlayerControl" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera")]
 script = ExtResource("3_23klk")
 actor = NodePath("../GridMap/SpriteActor")
-iso_camera_manager = NodePath("../IsoCameraManager")
+iso_camera = NodePath("../IsoCamera")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_bnvsd")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.800899, 0.5988, 0, -0.5988, 0.800899, 0, 9.41063, 0)
+transform = Transform3D(1, 0, 0, 0, 0.785846, 0.618422, 0, -0.618422, 0.785846, 0, 9.41063, 0)
 
 [node name="GridMap" type="GridMap" parent="."]
 mesh_library = ExtResource("1_lxa6j")
@@ -45,11 +70,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.60782, -1.34277)
 [node name="Chaser" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 10, 0)
 
-[node name="IsoCameraManager" type="Node3D" parent="."]
-script = ExtResource("6_tuhle")
+[node name="IsoCamera" parent="." instance=ExtResource("6_lbm1a")]
+zoom_level = 0.756
+height = 100.0
+noise = SubResource("FastNoiseLite_d4ab1")
 
-[node name="Camera3D" type="Camera3D" parent="IsoCameraManager"]
-transform = Transform3D(0.577858, -0.577097, 0.577096, 0, 0.707107, 0.707107, -0.816138, -0.408607, 0.408607, 2, 4, 2)
-projection = 1
-size = 8.0
-near = 0.001
+[node name="Camera3D" parent="IsoCamera/Orbiter" index="0"]
+transform = Transform3D(0.707107, -0.577096, 0.408607, 0, 0.577858, 0.816138, -0.707107, -0.577096, 0.408607, 50, 100, 50)
+size = 15.12
+
+[connection signal="pressed" from="CanvasLayer/MarginContainer/ShakeButton" to="IsoCamera" method="shake" binds= [1.0, 1.0]]
+
+[editable path="IsoCamera"]

@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://cb16m28qt5rjk"]
+
+[ext_resource type="Script" path="res://objects/iso_camera/iso_camera.gd" id="1_ieijm"]
+
+[node name="IsoCamera" type="Node3D"]
+script = ExtResource("1_ieijm")
+
+[node name="Orbiter" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="Orbiter"]
+transform = Transform3D(0.707107, -0.577096, 0.408607, 0, 0.577858, 0.816138, -0.707107, -0.577096, 0.408607, 5, 10, 5)
+projection = 1
+size = 8.0
+near = 0.01

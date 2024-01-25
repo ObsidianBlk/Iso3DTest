@@ -15,7 +15,7 @@ class_name PlayerControl
 # ------------------------------------------------------------------------------
 @export_category("Player Control")
 @export var actor : Actor = null:							set = set_actor
-@export var iso_camera_manager : IsoCameraManager = null:	set = set_iso_camera_manager
+@export var iso_camera : IsoCamera = null:					set = set_iso_camera
 
 # ------------------------------------------------------------------------------
 # Variables
@@ -30,13 +30,13 @@ func set_actor(a : Actor) -> void:
 		_DisconnectActor()
 		actor = a
 		_ConnectActor()
-		if iso_camera_manager != null:
-			iso_camera_manager.actor = actor
+		if iso_camera != null:
+			iso_camera.follow_target = actor
 
-func set_iso_camera_manager(icm : IsoCameraManager) -> void:
-	if iso_camera_manager !=icm:
-		iso_camera_manager = icm
-		iso_camera_manager.actor = actor
+func set_iso_camera(cam : IsoCamera) -> void:
+	if iso_camera != cam:
+		iso_camera = cam
+		iso_camera.follow_target = actor
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
@@ -47,8 +47,8 @@ func set_iso_camera_manager(icm : IsoCameraManager) -> void:
 # Override Methods
 # ------------------------------------------------------------------------------
 func _ready() -> void:
-	if iso_camera_manager != null:
-		iso_camera_manager.actor = actor
+	if iso_camera != null:
+		iso_camera.follow_target = actor
 
 func _unhandled_input(event: InputEvent) -> void:
 	if actor != null:
@@ -58,11 +58,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
 			var strength : float = Input.get_axis("turn_right", "turn_left")
 			actor.turn(strength)
-	if iso_camera_manager != null:
+	if iso_camera != null:
 		if event.is_action_pressed("camera_rotate_left"):
-			iso_camera_manager.rotate_camera_left()
+			iso_camera.rotate_left()
 		if event.is_action_pressed("camera_rotate_right"):
-			iso_camera_manager.rotate_camera_right()
+			iso_camera.rotate_right()
 
 # ------------------------------------------------------------------------------
 # Private Methods
