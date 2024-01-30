@@ -4,6 +4,8 @@
 
 [node name="IsoCamera" type="Node3D"]
 script = ExtResource("1_ieijm")
+zoom_level = 0.4
+height = 10.0
 
 [node name="Orbiter" type="Node3D" parent="."]
 

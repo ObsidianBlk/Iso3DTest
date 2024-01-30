@@ -1,9 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://detwgted2iayx"]
+[gd_scene load_steps=12 format=3 uid="uid://detwgted2iayx"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_dy0fl"]
 [ext_resource type="MeshLibrary" uid="uid://vksb2mjbfufr" path="res://mesh_libraries/mesh_library_01.meshlib" id="1_lxa6j"]
+[ext_resource type="PackedScene" uid="uid://cwin7c6nidhnq" path="res://objects/mobile_thumbstick/mobile_thumbstick.tscn" id="2_mb7o0"]
 [ext_resource type="PackedScene" uid="uid://cc1yqqhs2p13t" path="res://objects/sprite_actor/sprite_actor.tscn" id="2_q3leo"]
 [ext_resource type="Script" path="res://script/nodes/player_control.gd" id="3_23klk"]
+[ext_resource type="Texture2D" uid="uid://bswlp2bl4pf0i" path="res://assets/graphics/on_screen_controls/thumbstick/flatDark10.png" id="3_i1pce"]
+[ext_resource type="Texture2D" uid="uid://vmip7jmolb5w" path="res://assets/graphics/on_screen_controls/thumbstick/lineLight49.png" id="4_y5e1c"]
 [ext_resource type="PackedScene" uid="uid://bfu73mwxl4oj7" path="res://objects/character_actor/character_actor.tscn" id="5_tg2vn"]
 [ext_resource type="PackedScene" uid="uid://cb16m28qt5rjk" path="res://objects/iso_camera/iso_camera.tscn" id="6_lbm1a"]
 
@@ -41,6 +44,24 @@ layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 text = "Shake Camera"
+
+[node name="MobileThumbstick_L" parent="CanvasLayer" instance=ExtResource("2_mb7o0")]
+position = Vector2(86, 506)
+thumbstick = 0
+well_radius = 80.0
+stick_radius = 64.0
+dead_zone_radius = 32.0
+well_sprite = ExtResource("3_i1pce")
+stick_sprite = ExtResource("4_y5e1c")
+
+[node name="MobileThumbstick_R" parent="CanvasLayer" instance=ExtResource("2_mb7o0")]
+position = Vector2(1034, 506)
+thumbstick = 1
+well_radius = 80.0
+stick_radius = 64.0
+dead_zone_radius = 32.0
+well_sprite = ExtResource("3_i1pce")
+stick_sprite = ExtResource("4_y5e1c")
 
 [node name="PlayerControl" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera")]
 script = ExtResource("3_23klk")
