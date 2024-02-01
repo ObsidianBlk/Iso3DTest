@@ -15,14 +15,7 @@ enum THUMBSTICK {Left=0, Right=1}
 # Export Variables
 # ------------------------------------------------------------------------------
 @export_category("Mobile Thumbstick")
-@export var thumbstick : THUMBSTICK = THUMBSTICK.Left 
-@export_subgroup("Radii")
-@export var well_radius : float = 128.0:					set=set_well_radius
-@export var stick_radius : float = 64:							set=set_stick_radius
-@export var dead_zone_radius : float = 0.0:					set=set_dead_zone_radius
-@export_subgroup("Visuals")
-@export var well_sprite : Texture:							set=set_well_sprite
-@export var stick_sprite : Texture:							set=set_stick_sprite
+@export var config : MobileThumbstickConfig = null:			set=set_config
 
 
 # ------------------------------------------------------------------------------
@@ -33,7 +26,7 @@ var _touch_index : int = -1
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-@onready var _well_sprite: Sprite2D = %WellSprite
+@onready var _base_sprite: Sprite2D = %BaseSprite
 @onready var _stick_sprite: Sprite2D = %StickSprite
 @onready var _cshape: CollisionShape2D = %CollisionShape2D
 
@@ -41,44 +34,26 @@ var _touch_index : int = -1
 # ------------------------------------------------------------------------------
 # Setters / Getters
 # ------------------------------------------------------------------------------
-func set_stick_radius(r : float) -> void:
-	if r > 0.0:
-		stick_radius = r
-		if _cshape != null:
-			_cshape.shape.radius = stick_radius
-		queue_redraw()
-
-func set_well_radius(r : float) -> void:
-	if r > 0.0:
-		well_radius = r
-		queue_redraw()
-
-func set_dead_zone_radius(r : float) -> void:
-	if r >= 0.0:
-		dead_zone_radius = min(stick_radius, r)
-		queue_redraw()
-
-func set_well_sprite(t : Texture) -> void:
-	well_sprite = t
-	_ChangeSpriteTexture(_well_sprite, t)
-
-func set_stick_sprite(t : Texture) -> void:
-	stick_sprite = t
-	_ChangeSpriteTexture(_stick_sprite, stick_sprite)
+func set_config(conf : MobileThumbstickConfig) -> void:
+	_DisconnectConfig()
+	config = conf
+	_ConnectConfig()
+	_UpdateCollision()
 
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
 func _ready() -> void:
-	_ChangeSpriteTexture(_well_sprite, well_sprite)
-	_ChangeSpriteTexture(_stick_sprite, stick_sprite)
-	set_stick_radius(stick_radius)
+	_on_base_sprite_changed()
+	_on_stick_sprite_changed()
+	_ConnectConfig()
+	_UpdateCollision()
 
 func _draw() -> void:
-	if not Engine.is_editor_hint(): return
-	draw_arc(Vector2.ZERO, well_radius, 0.0, 2*PI, 32, Color.WHEAT, 2.0, true)
-	draw_arc(Vector2.ZERO, stick_radius, 0.0, 2*PI, 32, Color.AQUA, 2.0, true)
-	draw_arc(Vector2.ZERO, dead_zone_radius, 0.0, 2*PI, 32, Color.RED, 2.0, true)
+	if not Engine.is_editor_hint() or config == null: return
+	draw_arc(Vector2.ZERO, config.base_radius, 0.0, 2*PI, 32, Color.WHEAT, 2.0, true)
+	draw_arc(Vector2.ZERO, config.stick_radius, 0.0, 2*PI, 32, Color.AQUA, 2.0, true)
+	draw_arc(Vector2.ZERO, config.dead_zone_radius, 0.0, 2*PI, 32, Color.RED, 2.0, true)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -92,37 +67,67 @@ func _unhandled_input(event: InputEvent) -> void:
 			_SendAxisEvent()
 	if event is InputEventScreenDrag and _touch_index == event.index:
 		_stick_sprite.global_position = event.position
-		if _stick_sprite.position.length() > well_radius:
-			_stick_sprite.position = _stick_sprite.position.normalized() * well_radius
+		if _stick_sprite.position.length() > config.base_radius:
+			_stick_sprite.position = _stick_sprite.position.normalized() * config.base_radius
 		_SendAxisEvent()
 
 # ------------------------------------------------------------------------------
 # Private Methods
 # ------------------------------------------------------------------------------
-func _ChangeSpriteTexture(sprite : Sprite2D, t : Texture) -> void:
-	if sprite != null:
-		sprite.texture = t
+func _DisconnectConfig() -> void:
+	if config == null: return
+	if config.base_radius_changed.is_connected(_on_radius_changed.bind(false)):
+		config.base_radius_changed.disconnect(_on_radius_changed.bind(false))
+	if config.stick_radius_changed.is_connected(_on_radius_changed.bind(true)):
+		config.stick_radius_changed.disconnect(_on_radius_changed.bind(true))
+	if config.dead_zone_radius_changed.is_connected(_on_radius_changed.bind(false)):
+		config.dead_zone_radius_changed.disconnect(_on_radius_changed.bind(false))
+	if config.stick_spite_changed.is_connected(_on_stick_sprite_changed):
+		config.stick_spite_changed.disconnect(_on_stick_sprite_changed)
+	if config.base_sprite_changed.is_connected(_on_base_sprite_changed):
+		config.base_sprite_changed.disconnect(_on_base_sprite_changed)
+
+func _ConnectConfig() -> void:
+	if config == null: return
+	if not config.base_radius_changed.is_connected(_on_radius_changed.bind(false)):
+		config.base_radius_changed.connect(_on_radius_changed.bind(false))
+	if not config.stick_radius_changed.is_connected(_on_radius_changed.bind(true)):
+		config.stick_radius_changed.connect(_on_radius_changed.bind(true))
+	if not config.dead_zone_radius_changed.is_connected(_on_radius_changed.bind(false)):
+		config.dead_zone_radius_changed.connect(_on_radius_changed.bind(false))
+	if not config.stick_spite_changed.is_connected(_on_stick_sprite_changed):
+		config.stick_spite_changed.connect(_on_stick_sprite_changed)
+	if not config.base_sprite_changed.is_connected(_on_base_sprite_changed):
+		config.base_sprite_changed.connect(_on_base_sprite_changed)
+
+func _UpdateCollision() -> void:
+	if config == null or _cshape == null: return
+	_cshape.shape.radius = config.stick_radius
 
 func _IsOnStick(touch_position : Vector2) -> bool:
+	if config == null: return false
 	var dist : float = global_position.distance_to(touch_position)
-	return dist <= stick_radius
+	return dist <= config.stick_radius
 
 func _GetStrength() -> Vector2:
-	var maxlen : float = well_radius - dead_zone_radius
+	if config == null: return Vector2.ZERO
+	var maxlen : float = config.base_radius - config.dead_zone_radius
 	
-	var dirlen : float = _stick_sprite.position.length() - dead_zone_radius
+	var dirlen : float = _stick_sprite.position.length() - config.dead_zone_radius
 	var strength : float = dirlen / maxlen
 	
 	return Vector2.ZERO if strength < 0.01 else _stick_sprite.position.normalized() * strength
 
 func _SendAxisEvent() -> void:
+	if config == null: return
+	
 	var strength : Vector2 = _GetStrength()
 	var e : InputEventJoypadMotion = InputEventJoypadMotion.new()
-	e.axis = JOY_AXIS_LEFT_X if thumbstick == THUMBSTICK.Left else JOY_AXIS_RIGHT_X
+	e.axis = JOY_AXIS_LEFT_X if config.thumbstick == THUMBSTICK.Left else JOY_AXIS_RIGHT_X
 	e.axis_value = strength.x
 	Input.parse_input_event(e)
 	e = InputEventJoypadMotion.new()
-	e.axis = JOY_AXIS_LEFT_Y if thumbstick == THUMBSTICK.Left else JOY_AXIS_RIGHT_Y
+	e.axis = JOY_AXIS_LEFT_Y if config.thumbstick == THUMBSTICK.Left else JOY_AXIS_RIGHT_Y
 	e.axis_value = strength.y
 	Input.parse_input_event(e)
 
@@ -134,5 +139,19 @@ func _SendAxisEvent() -> void:
 # ------------------------------------------------------------------------------
 # Handler Methods
 # ------------------------------------------------------------------------------
+func _on_radius_changed(_radius : float, update_collision : bool) -> void:
+	if update_collision:
+		_UpdateCollision()
+	queue_redraw()
 
+func _on_base_sprite_changed() -> void:
+	if config == null:
+		_base_sprite.texture = null
+	else:
+		_base_sprite.texture = config.base_sprite
 
+func _on_stick_sprite_changed() -> void:
+	if config == null:
+		_stick_sprite.texture = null
+	else:
+		_stick_sprite.texture = config.stick_sprite
