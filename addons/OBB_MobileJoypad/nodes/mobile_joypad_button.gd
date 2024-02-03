@@ -1,5 +1,6 @@
 @tool
 extends Area2D
+class_name MobileJoypadButton
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -15,7 +16,7 @@ const FINGER_SHAPE_RADIUS : float = 10.0
 # Export Variables
 # ------------------------------------------------------------------------------
 @export_category("Mobile Joypad Button")
-@export var config : MobileJoypadButtonConfig = null
+@export var config : MobileJoypadButtonConfig = null:			set = set_config
 
 # ------------------------------------------------------------------------------
 # Variables
@@ -26,9 +27,9 @@ var _finger_shape : CircleShape2D = CircleShape2D.new()
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-@onready var _cshape: CollisionShape2D = %CShape
-@onready var _sprite: Sprite2D = %Sprite
-@onready var _finger_position: Marker2D = $FingerPosition
+@onready var _cshape: CollisionShape2D = CollisionShape2D.new()
+@onready var _sprite: Sprite2D = Sprite2D.new()
+@onready var _finger_position: Marker2D = Marker2D.new()
 
 
 # ------------------------------------------------------------------------------
@@ -38,22 +39,31 @@ func set_config(conf : MobileJoypadButtonConfig) -> void:
 	_DisconnectConfig()
 	config = conf
 	_ConnectConfig()
+	_UpdateSprite()
 	_on_shape_changed()
 
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
 func _ready() -> void:
+	# --- Layout setup
+	add_child(_sprite)
+	add_child(_finger_position)
+	add_child(_cshape)
+	# ---
+	
 	_finger_shape.radius = FINGER_SHAPE_RADIUS
 	_ConnectConfig()
+	_UpdateSprite()
 	_on_shape_changed()
 	input_event.connect(_on_input_event)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _touch_idx < 0 or _finger_position == null: return
 	if event is InputEventScreenDrag and event.index == _touch_idx:
+		_finger_position.global_position = event.position
 		if not _cshape.shape.collide(_cshape.transform, _finger_shape, _finger_position.transform):
-			print("Not TOUCHING me!!")
+			_UpdateTouching(-1)
 
 # ------------------------------------------------------------------------------
 # Private Methods
@@ -86,11 +96,19 @@ func _SendInput(pressed : bool) -> void:
 	Input.parse_input_event(e)
 
 func _UpdateSprite() -> void:
-	if _sprite == null or config == null: return
-	if _touch_idx < 0 or config.pressed_texture == null:
+	if _sprite == null: return
+	if config == null:
+		_sprite.texture = null
+	elif _touch_idx < 0 or config.pressed_texture == null:
 		_sprite.texture = config.normal_texture
 	elif _touch_idx >= 0 and config.pressed_texture != null:
 		_sprite.texture = config.pressed_texture
+
+func _UpdateTouching(idx : int) -> void:
+	_touch_idx = idx
+	_finger_position.position = Vector2.ZERO
+	_UpdateSprite()
+	_SendInput(idx >= 0)
 
 # ------------------------------------------------------------------------------
 # Public Methods
@@ -116,13 +134,9 @@ func _on_input_event(viewport : Node, event : InputEvent, shape_idx : int) -> vo
 	if config == null: return
 	if event is InputEventScreenTouch:
 		if event.is_pressed() and _touch_idx < 0:
-			_touch_idx = event.index
-			_UpdateSprite()
-			_SendInput(true)
+			_UpdateTouching(event.index)
 		elif event.is_released() and _touch_idx == event.index:
-			_touch_idx = -1
-			_UpdateSprite()
-			_SendInput(false)
+			_UpdateTouching(-1)
 
 
 
