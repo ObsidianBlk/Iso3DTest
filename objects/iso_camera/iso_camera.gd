@@ -11,6 +11,7 @@ class_name IsoCamera
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
 const ZOOM_LEVEL_MAX : float = 20.0
+const DEG_90_RAD : float = 1.5708
 
 # ------------------------------------------------------------------------------
 # Export Variables
@@ -37,6 +38,8 @@ static var _SceneTreeInstance : SceneTree = null
 # Variables
 # ------------------------------------------------------------------------------
 var _tween_active : bool = false
+var _target_rotation : float = 0.0
+
 var _tween_shake_active : bool = false
 var _shake_strength : float = 0.0
 
@@ -114,7 +117,7 @@ func _RotateCamera(dir : int) -> void:
 	dir = clampi(dir, -1, 1)
 	
 	var target_rotation : Vector3 = _orbiter.rotation
-	target_rotation.y += (PI * 0.5) * dir
+	target_rotation.y += DEG_90_RAD * dir
 	
 	_tween_active = true
 	var tween : Tween = create_tween()
@@ -140,7 +143,7 @@ static func Get_Current_Iso_Camera(view : Viewport = null) -> IsoCamera:
 	var parent : Node3D = current_camera.get_parent()
 	if parent == null: return null
 	
-	parent = current_camera.get_parent()
+	parent = parent.get_parent()
 	if not parent is IsoCamera: return null
 	
 	return parent
@@ -167,6 +170,21 @@ func shake(strength : float, duration : float) -> void:
 	_shake_strength = 0.0
 	_camera.h_offset = 0.0
 	_camera.v_offset = 0.0
+
+func get_current_rotation() -> float:
+	if _orbiter != null:
+		if _tween_active: # Actively rotating camera
+			var rot : float = wrapf(_orbiter.rotation.y, 0.0, PI*2)
+			if rot >= PI + DEG_90_RAD:
+				return PI + DEG_90_RAD
+			if rot >= PI:
+				return PI
+			if rot >= DEG_90_RAD:
+				return DEG_90_RAD
+			return 0.0
+		else:
+			return _orbiter.rotation.y
+	return 0.0
 
 # ------------------------------------------------------------------------------
 # Handler Methods

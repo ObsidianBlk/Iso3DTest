@@ -1,5 +1,5 @@
-extends Node
-class_name PlayerControl
+extends Actor8
+class_name SpriteActor8
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -9,40 +9,24 @@ class_name PlayerControl
 # ------------------------------------------------------------------------------
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
+const DEG_90_RAD : float = 1.5708
+const DEG_45_RAD : float = 0.7854
 
 # ------------------------------------------------------------------------------
 # Export Variables
 # ------------------------------------------------------------------------------
-@export_category("Player Control")
-@export var active : bool = true:							set = set_active
-@export var actor : Actor = null:							set = set_actor
-@export var iso_camera : IsoCamera = null:					set = set_iso_camera
+
 
 # ------------------------------------------------------------------------------
 # Variables
 # ------------------------------------------------------------------------------
-
+var _movement : Vector2 = Vector2.ZERO
 
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-func set_active(a : bool) -> void:
-	active = a
-	_UpdateCamTarget()
-	set_process_unhandled_input(active)
+@onready var _sprite: DirectionalSprite3D = $DirAnimSprite3D
 
-
-func set_actor(a : Actor) -> void:
-	if a != actor:
-		_DisconnectActor()
-		actor = a
-		_ConnectActor()
-		_UpdateCamTarget()
-
-func set_iso_camera(cam : IsoCamera) -> void:
-	if iso_camera != cam:
-		iso_camera = cam
-		_UpdateCamTarget()
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
@@ -52,47 +36,47 @@ func set_iso_camera(cam : IsoCamera) -> void:
 # ------------------------------------------------------------------------------
 # Override Methods
 # ------------------------------------------------------------------------------
-func _ready() -> void:
-	_UpdateCamTarget()
-	set_process_unhandled_input(active)
-
-func _unhandled_input(event: InputEvent) -> void:
-	if actor != null:
-		if _IsEventOneOf(event, ["forward", "backward", "left", "right"]):
-			var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
-			actor.move(movement)
-		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-			var strength : float = Input.get_axis("turn_right", "turn_left")
-			actor.turn(strength)
-	if iso_camera != null:
-		if event.is_action_pressed("camera_rotate_left"):
-			iso_camera.rotate_left()
-		if event.is_action_pressed("camera_rotate_right"):
-			iso_camera.rotate_right()
+func _physics_process(delta: float) -> void:
+	var cam : IsoCamera = _GetIsoCamera()
+	if cam == null: return
+	
+	_ProcessRotation(cam.get_current_rotation())
+	_ProcessVelocity(cam.get_current_rotation())
+	if _IsMoving():
+		_sprite.base_animation = "run"
+	else:
+		_sprite.base_animation = "idle"
+	move_and_slide()
+	
 
 # ------------------------------------------------------------------------------
 # Private Methods
 # ------------------------------------------------------------------------------
-func _ConnectActor() -> void:
-	if actor == null: return
+func _GetIsoCamera() -> IsoCamera:
+	var viewport : Viewport = get_viewport()
+	if viewport != null:
+		return IsoCamera.Get_Current_Iso_Camera(viewport)
+	return null
 
-func _DisconnectActor() -> void:
-	if actor == null: return
+func _ProcessRotation(cam_rotation : float) -> void:
+	if _movement.length() <= 0.01: return
+	var mrotated : Vector2 = _movement.rotated(cam_rotation - (PI + DEG_45_RAD))
+	_sprite.rotation.y = wrapf(mrotated.angle(), 0.0, PI*2)
 
-func _IsEventOneOf(event : InputEvent, actions : Array[String]) -> bool:
-	for action in actions:
-		if event.is_action(action):
-			return true
-	return false
+func _ProcessVelocity(cam_rotation : float) -> void:
+	print(rad_to_deg(cam_rotation + (DEG_45_RAD)))
+	var movement_rotated : Vector3 = Vector3(_movement.x, 0.0, -_movement.y).rotated(Vector3.UP, cam_rotation + (DEG_45_RAD))
+	velocity = movement_rotated * max_speed
+	velocity += Vector3.DOWN * gravity
 
-func _UpdateCamTarget() -> void:
-	if iso_camera == null: return
-	iso_camera.follow_target = actor if active else null
+func _IsMoving() -> bool:
+	return Vector2(velocity.x, velocity.z).length() > 0.01
 
 # ------------------------------------------------------------------------------
 # Public Methods
 # ------------------------------------------------------------------------------
-
+func move(movement : Vector2) -> void:
+	_movement = movement
 
 # ------------------------------------------------------------------------------
 # Handler Methods

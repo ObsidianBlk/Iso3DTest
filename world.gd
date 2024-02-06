@@ -24,6 +24,8 @@ extends Node3D
 # Onready Variables
 # ------------------------------------------------------------------------------
 @onready var _player_control: PlayerControl = $PlayerControl
+@onready var _player_control_8: PlayerControl8 = $PlayerControl8
+
 
 @onready var _sprite_actor: SpriteActor = $GridMap/SpriteActor
 @onready var _character_actor: CharacterActor = $GridMap/CharacterActor
@@ -40,7 +42,14 @@ extends Node3D
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().quit()
-	if event.is_action_pressed("actor_toggle"):
+	if event.is_action_pressed("controller_toggle"):
+		if _player_control.active:
+			_player_control.active = false
+			_player_control_8.active = true
+		else:
+			_player_control_8.active = false
+			_player_control.active = true
+	if event.is_action_pressed("actor_toggle") and _player_control.active:
 		if _player_control.actor == _sprite_actor:
 			_player_control.actor = _character_actor
 		else:

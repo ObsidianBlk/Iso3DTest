@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://detwgted2iayx"]
+[gd_scene load_steps=22 format=3 uid="uid://detwgted2iayx"]
 
 [ext_resource type="Script" path="res://world.gd" id="1_dy0fl"]
 [ext_resource type="MeshLibrary" uid="uid://vksb2mjbfufr" path="res://mesh_libraries/mesh_library_01.meshlib" id="1_lxa6j"]
@@ -14,6 +14,8 @@
 [ext_resource type="Texture2D" uid="uid://by0ra8ggxl56f" path="res://assets/graphics/on_screen_controls/flatDark35.png" id="7_anj3c"]
 [ext_resource type="Texture2D" uid="uid://lpsmfdygwfgp" path="res://assets/graphics/on_screen_controls/flatLight34.png" id="8_f78n8"]
 [ext_resource type="Script" path="res://addons/OBB_MobileJoypad/resources/mobile_joypad_button_config.gd" id="9_1rxrk"]
+[ext_resource type="Script" path="res://script/nodes/player_control8.gd" id="10_m33iy"]
+[ext_resource type="PackedScene" uid="uid://caiov5egvjkjd" path="res://objects/sprite_actor/sprite_actor8.tscn" id="14_3ress"]
 
 [sub_resource type="Resource" id="Resource_x30m2"]
 script = ExtResource("4_vm4po")
@@ -80,16 +82,22 @@ position = Vector2(144, 313)
 script = ExtResource("6_xh230")
 config = SubResource("Resource_o0qh3")
 
-[node name="PlayerControl" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera")]
-script = ExtResource("3_23klk")
-actor = NodePath("../GridMap/SpriteActor")
-iso_camera = NodePath("../IsoCamera")
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_bnvsd")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.785846, 0.618422, 0, -0.618422, 0.785846, 0, 9.41063, 0)
+
+[node name="PlayerControl8" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera")]
+script = ExtResource("10_m33iy")
+active = false
+actor = NodePath("../GridMap/sprite_actor8")
+iso_camera = NodePath("../IsoCamera")
+
+[node name="PlayerControl" type="Node" parent="." node_paths=PackedStringArray("actor", "iso_camera")]
+script = ExtResource("3_23klk")
+actor = NodePath("../GridMap/SpriteActor")
+iso_camera = NodePath("../IsoCamera")
 
 [node name="GridMap" type="GridMap" parent="."]
 mesh_library = ExtResource("1_lxa6j")
@@ -104,6 +112,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
 
 [node name="CharacterActor" parent="GridMap" instance=ExtResource("5_tg2vn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.60782, -1.34277)
+
+[node name="sprite_actor8" parent="GridMap" instance=ExtResource("14_3ress")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.34945, -5.82214)
 
 [node name="Chaser" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 10, 0)

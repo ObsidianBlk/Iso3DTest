@@ -1,5 +1,5 @@
 extends Node
-class_name PlayerControl
+class_name PlayerControl8
 
 # ------------------------------------------------------------------------------
 # Signals
@@ -10,12 +10,13 @@ class_name PlayerControl
 # Constants and ENUMs
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Export Variables
 # ------------------------------------------------------------------------------
-@export_category("Player Control")
+@export_category("Player Control8")
 @export var active : bool = true:							set = set_active
-@export var actor : Actor = null:							set = set_actor
+@export var actor : Actor8 = null:							set = set_actor
 @export var iso_camera : IsoCamera = null:					set = set_iso_camera
 
 # ------------------------------------------------------------------------------
@@ -26,13 +27,17 @@ class_name PlayerControl
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Setters / Getters
+# ------------------------------------------------------------------------------
 func set_active(a : bool) -> void:
 	active = a
 	_UpdateCamTarget()
 	set_process_unhandled_input(active)
 
-
-func set_actor(a : Actor) -> void:
+func set_actor(a : Actor8) -> void:
 	if a != actor:
 		_DisconnectActor()
 		actor = a
@@ -43,11 +48,6 @@ func set_iso_camera(cam : IsoCamera) -> void:
 	if iso_camera != cam:
 		iso_camera = cam
 		_UpdateCamTarget()
-
-# ------------------------------------------------------------------------------
-# Setters / Getters
-# ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Override Methods
@@ -61,13 +61,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _IsEventOneOf(event, ["forward", "backward", "left", "right"]):
 			var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
 			actor.move(movement)
-		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-			var strength : float = Input.get_axis("turn_right", "turn_left")
-			actor.turn(strength)
 	if iso_camera != null:
-		if event.is_action_pressed("camera_rotate_left"):
+		if event.is_action_pressed("turn_left"):
 			iso_camera.rotate_left()
-		if event.is_action_pressed("camera_rotate_right"):
+		if event.is_action_pressed("turn_right"):
 			iso_camera.rotate_right()
 
 # ------------------------------------------------------------------------------
