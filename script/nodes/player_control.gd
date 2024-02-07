@@ -58,11 +58,11 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if actor != null:
-		if _IsEventOneOf(event, ["forward", "backward", "left", "right"]):
-			var movement : Vector2 = Input.get_vector("left", "right", "backward", "forward")
+		if _IsEventOneOf(event, ["forward", "backward", "strafe_left", "strafe_right"]):
+			var movement : Vector2 = Input.get_vector("strafe_left", "strafe_right", "backward", "forward")
 			actor.move(movement)
-		if _IsEventOneOf(event, ["turn_left", "turn_right"]):
-			var strength : float = Input.get_axis("turn_right", "turn_left")
+		if _IsEventOneOf(event, ["left", "right"]):
+			var strength : float = Input.get_axis("right", "left")
 			actor.turn(strength)
 	if iso_camera != null:
 		if event.is_action_pressed("camera_rotate_left"):
@@ -81,7 +81,7 @@ func _DisconnectActor() -> void:
 
 func _IsEventOneOf(event : InputEvent, actions : Array[String]) -> bool:
 	for action in actions:
-		if event.is_action(action):
+		if event.is_action(action, true):
 			return true
 	return false
 

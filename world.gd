@@ -30,6 +30,9 @@ extends Node3D
 @onready var _sprite_actor: SpriteActor = $GridMap/SpriteActor
 @onready var _character_actor: CharacterActor = $GridMap/CharacterActor
 
+@onready var _8d_instructions: VBoxContainer = $"CanvasLayer/Controls/HBC/8D Instructions"
+@onready var _tank_instructions: VBoxContainer = $"CanvasLayer/Controls/HBC/Tank Instructions"
+
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
@@ -49,6 +52,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			_player_control_8.active = false
 			_player_control.active = true
+		_8d_instructions.visible = _player_control_8.active
+		_tank_instructions.visible = _player_control.active
 	if event.is_action_pressed("actor_toggle") and _player_control.active:
 		if _player_control.actor == _sprite_actor:
 			_player_control.actor = _character_actor

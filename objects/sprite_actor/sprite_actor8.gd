@@ -64,7 +64,6 @@ func _ProcessRotation(cam_rotation : float) -> void:
 	_sprite.rotation.y = wrapf(mrotated.angle(), 0.0, PI*2)
 
 func _ProcessVelocity(cam_rotation : float) -> void:
-	print(rad_to_deg(cam_rotation + (DEG_45_RAD)))
 	var movement_rotated : Vector3 = Vector3(_movement.x, 0.0, -_movement.y).rotated(Vector3.UP, cam_rotation + (DEG_45_RAD))
 	velocity = movement_rotated * max_speed
 	velocity += Vector3.DOWN * gravity
