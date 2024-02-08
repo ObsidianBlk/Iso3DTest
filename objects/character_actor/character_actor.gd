@@ -27,6 +27,7 @@ var _rotation_strength : float = 0.0
 # ------------------------------------------------------------------------------
 @onready var _character: Node3D = $Character
 @onready var _anim: AnimationPlayer = $Character/AnimationPlayer
+@onready var _animtree: AnimationTree = $AnimationTree
 
 
 
@@ -42,9 +43,12 @@ func _physics_process(delta: float) -> void:
 	_ProcessRotation(delta)
 	_ProcessVelocity()
 	if _IsMoving():
-		_anim.play("Running")
+		_animtree["parameters/Movement/transition_request"] = "Running"
 	else:
-		_anim.play("Idle")
+		_animtree["parameters/Movement/transition_request"] = "Idle"
+	_animtree["parameters/Strafe/transition_request"] = "Left" if _movement.x <= 0.0 else "Right"
+	_animtree["parameters/StrafeBlend/blend_amount"] = abs(_movement.x)
+	_animtree["parameters/TurnBlend/blend_amount"] = abs(_rotation_strength)
 	move_and_slide()
 
 # ------------------------------------------------------------------------------
