@@ -1,7 +1,6 @@
-# Iso3DTest
+# Iso 3D Test
 
-A prototype for an isometric game setup in a 3D environment
-
+This is a prototype / test project to work out ideas regarding isometric perspective, character style, and control schemes in 3D.
 
 ## Author
 Bryan "ObsidianBlk" Miller
@@ -9,21 +8,10 @@ Bryan "ObsidianBlk" Miller
 * [Itch.io Profile](https://obsidianblk.itch.io/)
 * [Github Profile](https://github.com/ObsidianBlk)
 
-## Installation
-
-Once downloaded simply start the executable.
-
-## Usage
-
-
 
 ## Credits
-
-### Art
-
-### Music
-
-### SFX
+Currently 3D art assets and some textures come from [Kenney](https://kenney.nl/)
+2D character sprites comes from [OpenGameArt / SKYZ0R](https://opengameart.org/content/400-items-basehumanmale-orc-skeleton)
 
 
 ## License
