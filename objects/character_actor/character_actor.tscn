@@ -89,12 +89,6 @@ shape = SubResource("CapsuleShape3D_kqo7j")
 [node name="Character" parent="." instance=ExtResource("1_cwibj")]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Character"]
-libraries = {
-"CharacterAnimations": SubResource("AnimationLibrary_b3wqc")
-}
-autoplay = "CharacterAnimations/Idle"
-
 [node name="Skeleton3D" parent="Character/Character" index="0"]
 bones/0/rotation = Quaternion(-0.707107, 9.05624e-08, 0.707107, -4.52812e-08)
 bones/0/scale = Vector3(1, 1, 1)
@@ -140,7 +134,6 @@ bones/34/scale = Vector3(1, 1, 1)
 bones/35/rotation = Quaternion(0.20382, -0.0142535, -0.00289127, 0.9789)
 bones/36/rotation = Quaternion(6.95698e-07, -3.21865e-06, 1.81049e-06, 1)
 bones/37/rotation = Quaternion(0.820401, -0.50814, 0.180533, 0.190115)
-bones/37/scale = Vector3(1, 1, 1)
 bones/38/rotation = Quaternion(-0.0986052, 0.84215, 0.421604, -0.32142)
 bones/39/rotation = Quaternion(-0.0755316, 0.0222654, 0.397905, 0.914041)
 bones/39/scale = Vector3(1, 1, 1)
@@ -173,6 +166,12 @@ bones/56/scale = Vector3(1, 1, 1)
 
 [node name="characterMedium" parent="Character/Character/Skeleton3D" index="0"]
 surface_material_override/0 = ExtResource("2_11vvh")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Character"]
+libraries = {
+"CharacterAnimations": SubResource("AnimationLibrary_b3wqc")
+}
+autoplay = "CharacterAnimations/Idle"
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 root_node = NodePath("../Character")

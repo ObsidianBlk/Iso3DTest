@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c3a642r14diyx"]
+
+[ext_resource type="PackedScene" uid="uid://oarayr1fwyhe" path="res://assets/models/Tileset_01/Tileset_001.glb" id="1_drsw4"]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_252s2"]
+data = PackedVector3Array(1, 0, -1, -1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1, -1, 0, 1, 1, -2, 1, -1, 0, 1, 1, 0, 1, 1, -2, 1, -1, -2, 1, -1, 0, 1, -1, -2, 1, -1, 0, -1, -1, 0, 1, -1, -2, 1, -1, -2, -1, -1, 0, -1, -1, -2, -1, 1, -2, 1, 1, -2, -1, -1, -2, -1, -1, -2, 1, 1, -2, 1, 1, -2, -1, 1, 0, 1, 1, 0, -1, 1, -2, -1, 1, -2, 1, 1, 0, 1, -1, -2, -1, 1, 0, -1, -1, 0, -1, -1, -2, -1, 1, -2, -1, 1, 0, -1)
+
+[node name="Tileset_01" type="Node3D"]
+
+[node name="Dungeon_Floor_2x2x2_01" parent="." instance=ExtResource("1_drsw4")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Dungeon_Floor_2x2x2_01/Dungeon_Floor_2x2x2_01" index="0"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Dungeon_Floor_2x2x2_01/Dungeon_Floor_2x2x2_01/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_252s2")
+
+[editable path="Dungeon_Floor_2x2x2_01"]
