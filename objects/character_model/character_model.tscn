@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3 uid="uid://cnuhnmvmueufu"]
+
+[ext_resource type="Script" path="res://objects/character_model/character_model.gd" id="1_amtun"]
+[ext_resource type="PackedScene" uid="uid://cwlscs5j6yfan" path="res://assets/models/Male_Test/body.glb" id="3_gof2k"]
+[ext_resource type="PackedScene" uid="uid://deqf1aw6flwi7" path="res://assets/models/Male_Test/shirt.glb" id="3_vcsyh"]
+[ext_resource type="PackedScene" uid="uid://3vp2fq1r8fm7" path="res://assets/models/Male_Test/Skeleton.glb" id="4_wnwrk"]
+[ext_resource type="AnimationLibrary" uid="uid://bs66rqcbeu2m6" path="res://assets/models/Male_Test/animations/AnimLib.res" id="5_f4dew"]
+
+[node name="CharacterModel" type="Node3D"]
+script = ExtResource("1_amtun")
+body_scene = ExtResource("3_gof2k")
+clothing = Array[PackedScene]([ExtResource("3_vcsyh")])
+
+[node name="Skeleton" parent="." instance=ExtResource("4_wnwrk")]
+
+[node name="Person" parent="Skeleton" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0860028, -0.0603479, 0.0711948)
+
+[node name="GeneralSkeleton" parent="Skeleton/Person" index="0"]
+bones/1/rotation = Quaternion(0.0412423, 0.0677517, -0.0421094, 0.99596)
+bones/2/rotation = Quaternion(0.00366562, 0.0196931, -0.00579323, 0.999783)
+bones/3/rotation = Quaternion(0.00364821, 0.0196719, -0.00585978, 0.999783)
+bones/4/rotation = Quaternion(-0.00711072, -0.00386581, 0.00147175, 0.999966)
+bones/5/rotation = Quaternion(-0.00711069, -0.0038658, 0.00147172, 0.999966)
+bones/6/rotation = Quaternion(-0.00711092, -0.0038658, 0.00147179, 0.999966)
+bones/7/rotation = Quaternion(0.5, 0.5, 0.5, -0.5)
+bones/8/rotation = Quaternion(-0.0397172, 0.969203, -0.196706, -0.142739)
+bones/9/rotation = Quaternion(-0.0430414, -0.683534, 0.0169688, 0.728451)
+bones/10/rotation = Quaternion(-0.0712703, 0.752061, 0.288494, 0.588299)
+bones/11/rotation = Quaternion(0.5, -0.5, -0.5, -0.5)
+bones/12/rotation = Quaternion(-0.175811, 0.977042, -0.0482815, -0.110219)
+bones/13/rotation = Quaternion(0.00868218, 0.780735, -0.0669614, 0.621203)
+bones/14/rotation = Quaternion(-0.215687, -0.618717, -0.133192, 0.743592)
+bones/19/rotation = Quaternion(0.0142247, 0.221268, 0.97368, 0.0527795)
+bones/20/rotation = Quaternion(-0.0103613, 0.997516, -0.0297399, 0.0630097)
+bones/21/rotation = Quaternion(0.0279643, 0.765812, -0.641883, -0.0271272)
+bones/22/rotation = Quaternion(-0.000784423, 0.999364, 0.0356017, -0.0020215)
+bones/24/rotation = Quaternion(-0.125582, -0.170593, 0.973867, 0.0819144)
+bones/25/rotation = Quaternion(0.0101211, 0.985067, -0.162999, 0.0545186)
+bones/26/rotation = Quaternion(0.0220922, 0.759849, -0.649614, -0.0119894)
+bones/27/rotation = Quaternion(-0.012592, 0.906155, 0.421411, -0.0337272)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../Skeleton")
+libraries = {
+"AnimLib": ExtResource("5_f4dew")
+}
+autoplay = "AnimLib/Walk"
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.992949, 1.12342)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.920696, 0.390281, 0, -0.390281, 0.920696, 0, 2.3361, 0)
+
+[editable path="Skeleton"]
