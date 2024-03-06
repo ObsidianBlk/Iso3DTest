@@ -1,4 +1,4 @@
-@tool
+#@tool
 extends Node3D
 
 # ------------------------------------------------------------------------------
@@ -27,7 +27,7 @@ var _meshes : Dictionary = {}
 # ------------------------------------------------------------------------------
 # Onready Variables
 # ------------------------------------------------------------------------------
-@onready var _armature: Skeleton3D = $Skeleton/Person/GeneralSkeleton
+@onready var _armature: Skeleton3D = $Armature/Armature/GeneralSkeleton
 
 # ------------------------------------------------------------------------------
 # Setters / Getters
